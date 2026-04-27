@@ -1,0 +1,405 @@
+/* ===== SPACE INVADERS: ZAYD EDITION ===== */
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Press+Start+2P&display=swap');
+
+:root {
+  --neon-green:   #00ff88;
+  --neon-blue:    #00cfff;
+  --neon-pink:    #ff2d78;
+  --neon-yellow:  #ffe600;
+  --neon-purple:  #bf5fff;
+  --neon-orange:  #ff8c00;
+  --bg-dark:      #040410;
+  --bg-mid:       #0a0a2e;
+  --text-glow:    0 0 10px var(--neon-blue), 0 0 30px var(--neon-blue);
+  --green-glow:   0 0 8px var(--neon-green), 0 0 20px var(--neon-green);
+  --pink-glow:    0 0 8px var(--neon-pink),  0 0 24px var(--neon-pink);
+  --yellow-glow:  0 0 8px var(--neon-yellow),0 0 24px var(--neon-yellow);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: var(--bg-dark);
+  font-family: 'Orbitron', sans-serif;
+  color: #fff;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+/* ===== STAR CANVAS ===== */
+#starCanvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ===== APP WRAPPER ===== */
+#app {
+  position: relative;
+  width: 100%; height: 100%;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===== SCREENS ===== */
+.screen {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%; height: 100%;
+  position: absolute;
+  top: 0; left: 0;
+  padding: 20px;
+}
+.screen.active { display: flex; }
+
+/* ===== TITLE SCREEN ===== */
+#titleScreen {
+  background: radial-gradient(ellipse at center, #0d0d40 0%, #040410 70%);
+  gap: 18px;
+}
+
+.title-glow {
+  text-align: center;
+  animation: floatTitle 3s ease-in-out infinite;
+}
+
+@keyframes floatTitle {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-10px); }
+}
+
+.title-emoji {
+  font-size: clamp(3rem, 12vw, 6rem);
+  animation: spinBob 2s ease-in-out infinite;
+}
+
+@keyframes spinBob {
+  0%, 100% { transform: rotate(-10deg) scale(1); }
+  50%       { transform: rotate(10deg) scale(1.1); }
+}
+
+.title-main {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(1.2rem, 5vw, 2.8rem);
+  color: var(--neon-green);
+  text-shadow: var(--green-glow);
+  letter-spacing: 0.05em;
+  line-height: 1.4;
+}
+
+.title-sub {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(0.8rem, 3vw, 1.4rem);
+  color: var(--neon-yellow);
+  text-shadow: var(--yellow-glow);
+  margin-top: 6px;
+  letter-spacing: 0.2em;
+}
+
+.title-info {
+  text-align: center;
+  margin: 10px 0;
+}
+
+.blink-text {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(0.55rem, 2vw, 0.9rem);
+  color: var(--neon-pink);
+  text-shadow: var(--pink-glow);
+  animation: blinkAnim 1.2s step-start infinite;
+}
+@keyframes blinkAnim { 50% { opacity: 0; } }
+
+.controls-hint {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+.hint-item {
+  background: rgba(0,207,255,0.1);
+  border: 1px solid var(--neon-blue);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: clamp(0.55rem, 1.8vw, 0.75rem);
+  color: var(--neon-blue);
+  text-shadow: var(--text-glow);
+}
+
+.high-score-display {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(0.55rem, 2vw, 0.85rem);
+  color: var(--neon-yellow);
+  text-shadow: var(--yellow-glow);
+}
+
+.alien-parade {
+  font-size: clamp(1.5rem, 5vw, 2.5rem);
+  animation: paradeMove 4s linear infinite;
+  letter-spacing: 0.3em;
+}
+@keyframes paradeMove {
+  0%   { transform: translateX(-30px); }
+  50%  { transform: translateX(30px); }
+  100% { transform: translateX(-30px); }
+}
+
+/* ===== BUTTONS ===== */
+.btn-main {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(0.7rem, 2.5vw, 1rem);
+  padding: 14px 30px;
+  background: linear-gradient(135deg, var(--neon-green), var(--neon-blue));
+  border: none;
+  border-radius: 50px;
+  color: #000;
+  cursor: pointer;
+  box-shadow: 0 0 20px var(--neon-green), 0 0 40px rgba(0,255,136,0.3);
+  transition: transform 0.15s, box-shadow 0.15s;
+  margin: 6px;
+}
+.btn-main:hover, .btn-main:active {
+  transform: scale(1.08);
+  box-shadow: 0 0 30px var(--neon-green), 0 0 60px rgba(0,255,136,0.5);
+}
+
+.btn-secondary {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(0.6rem, 2vw, 0.85rem);
+  padding: 12px 24px;
+  background: transparent;
+  border: 2px solid var(--neon-pink);
+  border-radius: 50px;
+  color: var(--neon-pink);
+  cursor: pointer;
+  text-shadow: var(--pink-glow);
+  box-shadow: 0 0 12px var(--neon-pink);
+  transition: transform 0.15s, background 0.15s;
+  margin: 6px;
+}
+.btn-secondary:hover, .btn-secondary:active {
+  background: rgba(255,45,120,0.15);
+  transform: scale(1.05);
+}
+
+/* ===== GAME SCREEN ===== */
+#gameScreen {
+  flex-direction: column;
+  background: transparent;
+  padding: 0;
+  justify-content: flex-start;
+}
+
+/* HUD */
+#hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 900px;
+  padding: 8px 16px;
+  background: rgba(0,0,0,0.6);
+  border-bottom: 2px solid var(--neon-blue);
+  backdrop-filter: blur(4px);
+  flex-shrink: 0;
+}
+.hud-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 80px;
+}
+.hud-item.hud-center { align-items: center; }
+.hud-item.hud-right  { align-items: flex-end; }
+
+.hud-label {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(0.45rem, 1.5vw, 0.6rem);
+  color: var(--neon-blue);
+  letter-spacing: 0.15em;
+  opacity: 0.8;
+}
+.hud-value {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(0.75rem, 2.5vw, 1.1rem);
+  color: var(--neon-green);
+  text-shadow: var(--green-glow);
+}
+
+/* GAME CANVAS */
+#gameCanvas {
+  display: block;
+  flex: 1;
+  width: 100%;
+  max-width: 900px;
+  cursor: none;
+  image-rendering: pixelated;
+}
+
+/* ===== TOUCH CONTROLS ===== */
+#touchControls {
+  width: 100%;
+  max-width: 900px;
+  padding: 10px 20px;
+  background: rgba(0,0,0,0.5);
+  border-top: 2px solid rgba(0,207,255,0.3);
+  flex-shrink: 0;
+}
+
+.touch-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.touch-btn {
+  flex: 1;
+  height: 60px;
+  max-height: 70px;
+  background: rgba(0,207,255,0.1);
+  border: 2px solid var(--neon-blue);
+  border-radius: 14px;
+  color: var(--neon-blue);
+  font-size: 1.6rem;
+  cursor: pointer;
+  transition: background 0.1s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.touch-btn:active {
+  background: rgba(0,207,255,0.3);
+  transform: scale(0.95);
+}
+.fire-btn {
+  flex: 1.4;
+  background: rgba(255,45,120,0.15);
+  border-color: var(--neon-pink);
+  color: var(--neon-pink);
+  font-size: 2rem;
+  box-shadow: 0 0 12px rgba(255,45,120,0.4);
+}
+.fire-btn:active {
+  background: rgba(255,45,120,0.35);
+}
+
+/* Hide touch controls on desktop if no touch */
+@media (hover: hover) and (pointer: fine) {
+  #touchControls { display: none; }
+}
+
+/* ===== OVERLAY SCREENS ===== */
+#levelUpScreen {
+  background: radial-gradient(ellipse at center, rgba(0,255,136,0.2) 0%, rgba(4,4,16,0.95) 70%);
+}
+.level-up-content {
+  text-align: center;
+  animation: levelUpAnim 0.5s ease-out;
+}
+@keyframes levelUpAnim {
+  from { transform: scale(0.5); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+.level-up-emoji  { font-size: 5rem; margin-bottom: 16px; animation: spinOnce 0.6s ease-out; }
+@keyframes spinOnce { from { transform: rotate(-180deg) scale(0); } to { transform: rotate(0) scale(1); } }
+.level-up-content h2 {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(1rem, 4vw, 2rem);
+  color: var(--neon-yellow);
+  text-shadow: var(--yellow-glow);
+  margin-bottom: 10px;
+}
+.level-up-content p {
+  font-size: clamp(0.7rem, 2.5vw, 1rem);
+  color: var(--neon-blue);
+  margin-bottom: 16px;
+}
+.level-up-stars { font-size: 2.5rem; animation: pulse 0.8s ease-in-out infinite alternate; }
+@keyframes pulse { from { transform: scale(1); } to { transform: scale(1.2); } }
+
+#gameOverScreen {
+  background: radial-gradient(ellipse at center, rgba(255,45,120,0.2) 0%, rgba(4,4,16,0.95) 70%);
+}
+.gameover-content { text-align: center; }
+.gameover-emoji { font-size: 5rem; margin-bottom: 12px; animation: shake 0.5s ease-out; }
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  25% { transform: translateX(-12px); }
+  75% { transform: translateX(12px); }
+}
+.gameover-content h2 {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(1rem, 4vw, 2rem);
+  color: var(--neon-pink);
+  text-shadow: var(--pink-glow);
+  margin-bottom: 14px;
+}
+.gameover-content p {
+  font-size: clamp(0.7rem, 2.5vw, 1rem);
+  color: #fff;
+  margin-bottom: 10px;
+}
+
+#winScreen {
+  background: radial-gradient(ellipse at center, rgba(191,95,255,0.25) 0%, rgba(4,4,16,0.95) 70%);
+}
+.win-content { text-align: center; }
+.win-emoji { font-size: 5rem; margin-bottom: 16px; animation: bounce 0.6s ease-out 3; }
+@keyframes bounce {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+.win-content h2 {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(1rem, 4vw, 2rem);
+  color: var(--neon-purple);
+  text-shadow: 0 0 8px var(--neon-purple), 0 0 24px var(--neon-purple);
+  margin-bottom: 14px;
+}
+.win-content p {
+  font-size: clamp(0.7rem, 2.5vw, 1rem);
+  color: #fff;
+  margin-bottom: 10px;
+}
+
+/* Misc */
+.highlight {
+  color: var(--neon-yellow);
+  text-shadow: var(--yellow-glow);
+  font-family: 'Press Start 2P', monospace;
+}
+.new-highscore {
+  color: var(--neon-green) !important;
+  text-shadow: var(--green-glow) !important;
+  font-family: 'Press Start 2P', monospace !important;
+  animation: blinkAnim 0.6s step-start infinite;
+}
+.hidden { display: none !important; }
+
+/* Screen flash effect */
+body.flash-red   { animation: flashRed 0.15s ease-out; }
+body.flash-green { animation: flashGreen 0.2s ease-out; }
+@keyframes flashRed   { 0%,100% { background: var(--bg-dark); } 50% { background: #3a0010; } }
+@keyframes flashGreen { 0%,100% { background: var(--bg-dark); } 50% { background: #002a18; } }
+
+/* Responsive: very small screens */
+@media (max-height: 500px) {
+  .title-emoji { font-size: 2.5rem; }
+  .alien-parade { display: none; }
+  .controls-hint { display: none; }
+  #hud { padding: 4px 10px; }
+  .touch-btn { height: 50px; }
+}
